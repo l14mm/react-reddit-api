@@ -20,7 +20,19 @@ router.get("/", function(req, res, next) {
       }
     },
     function(error, response, body) {
-      res.json(body);
+      const { access_token } = JSON.parse(body);
+      request.get(
+        "https://oauth.reddit.com/api/v1/me",
+        {
+          headers: {
+            Authorization: `bearer ${access_token}`,
+            "User-Agent": "react-reddit by liam"
+          }
+        },
+        function(error, response, body) {
+          res.json(JSON.parse(body));
+        }
+      );
     }
   );
 });
