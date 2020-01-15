@@ -2,6 +2,22 @@ var express = require("express");
 var router = express.Router();
 var request = require("request");
 
+router.get("/posts", function(req, res, next) {
+  const { query, after, access_token } = req.query;
+  request.get(
+    `https://oauth.reddit.com/${query}.json?after=${after}`,
+    {
+      headers: {
+        Authorization: `bearer ${access_token}`,
+        "User-Agent": "react-reddit by liam"
+      }
+    },
+    function(error, response, body) {
+      res.json(JSON.parse(body));
+    }
+  );
+});
+
 router.get("/", function(req, res, next) {
   const encoded = Buffer.from(
     `${process.env.CLIENT_ID}:${process.env.CLIENT_SECRET}`
@@ -30,7 +46,7 @@ router.get("/", function(req, res, next) {
           }
         },
         function(error, response, body) {
-          res.json(JSON.parse(body));
+          res.json({ ...JSON.parse(body), access_token });
         }
       );
     }
