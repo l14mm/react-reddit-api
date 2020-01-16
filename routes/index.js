@@ -36,7 +36,7 @@ router.get("/", function(req, res, next) {
       }
     },
     function(error, response, body) {
-      const { access_token } = JSON.parse(body);
+      const { access_token, refresh_token, expires_in } = JSON.parse(body);
       request.get(
         "https://oauth.reddit.com/api/v1/me",
         {
@@ -46,7 +46,12 @@ router.get("/", function(req, res, next) {
           }
         },
         function(error, response, body) {
-          res.json({ ...JSON.parse(body), access_token });
+          res.json({
+            ...JSON.parse(body),
+            access_token,
+            refresh_token,
+            expires_in
+          });
         }
       );
     }
