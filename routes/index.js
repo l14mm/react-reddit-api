@@ -3,22 +3,33 @@ var router = express.Router();
 var request = require("request");
 
 const OAUTH_API_URL = "https://oauth.reddit.com";
+const REDDIT_URL = "https://www.reddit.com";
 const API_URL = "https://www.reddit.com/api/v1";
 
 router.get("/posts", function(req, res, next) {
   const { query, after, access_token } = req.query;
-  request.get(
-    `${OAUTH_API_URL}/${query}.json?after=${after}`,
-    {
-      headers: {
-        Authorization: `bearer ${access_token}`,
-        "User-Agent": "react-reddit by liam"
+  if (access_token !== "undefined") {
+    request.get(
+      `${OAUTH_API_URL}/${query}.json?after=${after}`,
+      {
+        headers: {
+          Authorization: `bearer ${access_token}`,
+          "User-Agent": "react-reddit by liam"
+        }
+      },
+      function(error, response, body) {
+        res.json(JSON.parse(body));
       }
-    },
-    function(error, response, body) {
+    );
+  } else {
+    request.get(`${REDDIT_URL}/${query}.json?after=${after}`, function(
+      error,
+      response,
+      body
+    ) {
       res.json(JSON.parse(body));
-    }
-  );
+    });
+  }
 });
 
 router.get("/refresh", function(req, res, next) {
